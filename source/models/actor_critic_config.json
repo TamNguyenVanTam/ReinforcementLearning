@@ -1,0 +1,7 @@
+{
+	"buffer_size": 10000,
+	"act_lr": 1e-3,
+	"cri_lr": 1e-3,
+	"num_episodes": 100,
+	"batch_size": 32
+}
