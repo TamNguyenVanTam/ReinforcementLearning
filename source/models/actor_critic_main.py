@@ -124,7 +124,6 @@ if __name__ == "__main__":
 				
 				total_reward = 0
 				while not done:
-
 					action = sel_action_actor_critic(env, policy, state, sess, -1.0)
 					next_state, reward, done, info = env.step(action)
 					
@@ -134,8 +133,7 @@ if __name__ == "__main__":
 				average_reward.append(total_reward)
 
 			average_reward = np.mean(average_reward)
-			exp_rewards_log["episode"] = average_reward
-
+			exp_rewards_log["episode_{:8d}".format(episode+1)] = average_reward
 
 			log_file = os.path.join(config["log_dir"], config["log_file"])
 		
