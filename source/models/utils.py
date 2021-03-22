@@ -22,15 +22,3 @@ def load_json_file(file):
 		content = json.load(json_file)
 
 	return content
-
-def save_checkpoint(saver, sess, config):
-	"""
-	save checkpoint 
-	"""
-	pass
-
-def load_checkpoint(saver, sess, config):
-	"""
-	Load checkpoint
-	"""
-	pass
