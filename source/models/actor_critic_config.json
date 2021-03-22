@@ -2,6 +2,17 @@
 	"buffer_size": 10000,
 	"act_lr": 1e-3,
 	"cri_lr": 1e-3,
-	"num_episodes": 100,
-	"batch_size": 32
+	"gamma": 0.6,
+	"num_episodes": 100000,
+	"batch_size": 512,
+	"env_name": "CartPole-v0",
+	"max_eps": 1.0,
+	"min_eps": 0.1,
+	"log_dir": "./log",
+	"log_file": "actor_critic.json",
+	"checkpoint_dir": "./checkpoints",
+	"checkpoint": "actor_critic.ckpt",
+
+	"gpu_idx": "1",
+	"num_epoch_per_episode": 50
 }

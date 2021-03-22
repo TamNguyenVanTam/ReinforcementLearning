@@ -12,7 +12,7 @@ from framework.utils import sel_action_actor_critic
 from backbones.backbonev1 import TSDV1
 from base.memory import Memory
 
-from utils import load_json_file, save_checkpoint, load_checkpoint
+from utils import load_json_file
 
 import argparse
 parser = argparse.ArgumentParser(description='Arguments for Actor and Critic Project')
@@ -27,6 +27,9 @@ if __name__ == "__main__":
 	
 	if not os.path.exists(config["log_dir"]):
 		os.makedirs(config["log_dir"])
+
+	if not os.path.exists(config["checkpoint_dir"]):
+		os.makedirs(config["checkpoint_dir"])
 	"""
 	Define Environment Varible which simulates the considered environment
 	"""
@@ -49,6 +52,8 @@ if __name__ == "__main__":
 	policy.init_actor_critic()
 	policy.inference()
 
+	saver = tf.train.Saver()
+
 	# Create Section for Running
 
 	os.environ["CUDA_VISIBLE_DEVICES"] = config["gpu_idx"]
@@ -56,9 +61,7 @@ if __name__ == "__main__":
 	sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_option))
 	sess.run(tf.global_variables_initializer())
 	
-	exp_rewards_log = {}
-
-
+	exp_rewards_log, best_reward = {}, -np.Inf
 	"""
 	Perform Training Phase	
 	"""
@@ -139,3 +142,9 @@ if __name__ == "__main__":
 		
 			with open(log_file, "w") as f:
 				json.dump(exp_rewards_log, f, indent=4, sort_keys=True)
+
+			if average_reward > best_reward:
+				print("Save Best Model")	
+				best_reward = average_reward
+				save_path = os.path.join(config["checkpoint_dir"], config["checkpoint"])
+				saver.save(sess, save_path)
