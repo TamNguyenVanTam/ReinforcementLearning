@@ -69,12 +69,16 @@ class ActorCritic:
 		# Perform Critic Phase
 	
 		gt = self._critic(self._next_states) * self._gamma + self._rewards
-		td_error = gt - self._critic(self._states)
-		self._cri_loss = tf.reduce_mean(td_error ** 2)
+		td_error = (gt - self._critic(self._states)) ** 2
+		self._cri_loss = tf.reduce_mean(td_error)
 		
 		# Perform Actor Phase
-		act_probs = self._actor(self._states)
-		self._act_loss = tf.reduce_mean(-td_error * tf.nn.log_softmax(act_probs, axis=-1))
+		self._act_probs = self._actor(self._states)
+
+		log_action = tf.reduce_sum(tf.nn.log_softmax(self._act_probs, axis=-1) * self._actions, axis=-1)
+
+
+		self._act_loss = tf.reduce_mean(-td_error * log_action)
 
 		self._act_op = tf.compat.v1.train.AdamOptimizer(self._act_lr).minimize(self._act_loss, var_list=self._act_variables)
 		self._cri_op = tf.compat.v1.train.AdamOptimizer(self._cri_lr).minimize(self._cri_loss, var_list=self._cri_variables)
