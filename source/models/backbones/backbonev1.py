@@ -29,9 +29,10 @@ class TSDV1:
 		Params: + out_dims: Integer	
 		Params: + name: String
 		"""
-		self._name = name 
+		self._name = name
 		self._in_dims = in_dims
 		self._out_dims = out_dims
+		self._outputs = None
 
 		self.create_network()
 
@@ -41,21 +42,26 @@ class TSDV1:
 		"""
 
 		layer1 = Dense(input_dim=self._in_dims,
-					output_dim=32,
+					output_dim=64,
 					act=lrelu,
 					bias=True)
 			
-		layer2 = Dense(input_dim=32,
-					output_dim=32,
+		layer2 = Dense(input_dim=64,
+					output_dim=64,
+					act=lrelu,
+					bias=True)
+		
+		layer3 = Dense(input_dim=64,
+					output_dim=64,
 					act=lrelu,
 					bias=True)
 
-		layer3 = Dense(input_dim=32,
+		layer4 = Dense(input_dim=64,
 					output_dim=self._out_dims,
 					act=linear,
 					bias=True)
 
-		self._layers = [layer1, layer2, layer3]
+		self._layers = [layer1, layer2, layer3, layer4]
 		# Get Trainble Variable
 		self._train_vars = []
 		for layer in self._layers:
@@ -86,4 +92,5 @@ class TSDV1:
 		for layer in self._layers:
 			x = layer(x)
 		outputs = x
+		
 		return outputs
