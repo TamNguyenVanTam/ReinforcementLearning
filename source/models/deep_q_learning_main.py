@@ -17,7 +17,7 @@ from utils import load_json_file
 import argparse
 parser = argparse.ArgumentParser(description='Arguments for Deep Q Learning')
 parser.add_argument("--config_file", dest="config_file", help="for Deep Q Learning",\
-        default="actor_critic_config.json")
+        default="deep_q_learning_config.json")
 parser.add_argument("--phase", dest="phase", help="Dicide for Training or Testing", default="train")
 args = parser.parse_args()
 
@@ -52,6 +52,7 @@ if __name__ == "__main__":
     sess.run(tf.global_variables_initializer())
 
     exp_rewards_log, best_reward = {}, -np.Inf
+    saver = tf.train.Saver()
     """
     Perform Training Phase  
     """
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         state = env.reset()
         done = False
         if (episode + 1) % 50 == 0:
-            epsilon *= 0.999
+            epsilon *= 0.99
         epsilon = max(epsilon, config["min_eps"])
         while not done:
             action = sel_action_deep_q_learning(env, policy, state, sess, epsilon)
@@ -88,11 +89,11 @@ if __name__ == "__main__":
                                 policy._actions: actions,
                                 policy._rewards: rewards,
                                 policy._dones: dones,
-                                policy._gamma: 0.9,
-                                policy._lr: 1e-3})
+                                policy._gamma: config["gamma"],
+                                policy._lr: config["lr"]})
 
         if (episode +1) % 50 == 0:          
-            average_reward = []
+            average_reward, updated = [], False
             for game in range(10):
                 state = env.reset()
 
@@ -104,8 +105,22 @@ if __name__ == "__main__":
                     state = next_state
                     total_reward += reward
                 average_reward.append(total_reward)
-                
+
             average_reward = np.mean(average_reward)
             exp_rewards_log["episode_{:8d}".format(episode+1)] = average_reward
+
+            
+            log_file = os.path.join(config["log_dir"], config["log_file"])
+        
+            with open(log_file, "w") as f:
+                json.dump(exp_rewards_log, f, indent=4, sort_keys=True)
+
+            if average_reward > best_reward:
+                updated = True   
+                best_reward = average_reward
+                save_path = os.path.join(config["checkpoint_dir"], config["checkpoint"])
+                saver.save(sess, save_path)
+            
             # Perform Evaluatation
-            print("Episode {:5d}  Loss: {:.5f} - Expectation Reward {:.5f} - Epsilon {:.5f}".format(episode+1, loss, average_reward, epsilon))
+            print("Episode {:5d}  Loss: {:.5f} - Expectation Reward {:.5f} - Epsilon {:.5f} - Updated : {}".\
+                format(episode+1, loss, average_reward, epsilon, updated))
