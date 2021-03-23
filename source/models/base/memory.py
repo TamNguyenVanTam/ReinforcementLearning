@@ -44,7 +44,7 @@ class Memory(MemoryBase):
 		Select n samples from queue
 		+ Params: batch_size: Integer
 		"""
-		batch = {"s":[], "a":[], "ns":[], "r":[]}
+		batch = {"s":[], "a":[], "ns":[], "r":[], "d":[]}
 		
 		if batch.keys() != self._queue.keys():
 			raise Exception("Format of Batch and Queue must be same")

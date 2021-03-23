@@ -16,7 +16,8 @@ class MemoryBase(object):
 						"s":[],
 						"a":[],
 						"ns":[],
-						"r":[]
+						"r":[],
+						"d":[]
 					}
 		self._cur_size = 0
 		self._pris = None
