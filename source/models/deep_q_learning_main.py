@@ -57,11 +57,17 @@ if __name__ == "__main__":
     Perform Training Phase  
     """
     epsilon = config["max_eps"]
+    dis_lr = 1.0
     for episode in range(config["num_episodes"]):
+
         state = env.reset()
         done = False
         if (episode + 1) % 50 == 0:
             epsilon *= 0.99
+
+        if (episode + 1) % 1000 == 0:
+            dis_lr *= 10.0
+
         epsilon = max(epsilon, config["min_eps"])
         while not done:
             action = sel_action_deep_q_learning(env, policy, state, sess, epsilon)
@@ -90,7 +96,7 @@ if __name__ == "__main__":
                                 policy._rewards: rewards,
                                 policy._dones: dones,
                                 policy._gamma: config["gamma"],
-                                policy._lr: config["lr"]})
+                                policy._lr: config["lr"]/dis_lr})
 
         if (episode +1) % 50 == 0:          
             average_reward, updated = [], False
